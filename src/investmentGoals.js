@@ -4,7 +4,7 @@ function converToMonthlyReturnRate(yearlyReturnRate) {
   return yearlyReturnRate ** (1 / 12);
 }
 
-function generateReturnsArray(
+export function generateReturnsArray(
   startingAmount = 0,
   timeHorizon = 0,
   timePeriod = 'monthly',
@@ -13,7 +13,7 @@ function generateReturnsArray(
   returnTimeframe = 'monthly',
 ) {
   validateAmount('Investimento inicial', startingAmount);
-  validateAmount('Aporte adicional', monthlyContribuition);
+  // validateAmount('Aporte adicional', monthlyContribuition);
   validateTimeHorizon(timeHorizon);
   validateAmount('Rentabilidade', returnRate);
 
@@ -46,23 +46,21 @@ function generateReturnsArray(
     const interestReturns =
       returnsArray[timeReference - 1].totalAmount * (finalReturnRate - 1);
 
-    const totalInterestReturns =
-      returnsArray[timeReference - 1].totalInterestReturns + interestReturns;
-
     const totalAmount =
       returnsArray[timeReference - 1].totalAmount * finalReturnRate +
       monthlyContribuition;
 
+    const totalInterestReturns =
+      returnsArray[timeReference - 1].totalInterestReturns + interestReturns;
+
     returnsArray.push({
-      investedAmount,
-      interestReturns,
-      totalInterestReturns,
+      investedAmount: Number(investedAmount.toFixed(2)),
+      interestReturns: Number(interestReturns.toFixed(2)),
+      totalInterestReturns: Number(totalInterestReturns.toFixed(2)),
       monthCounter: timeReference,
-      totalAmount,
+      totalAmount: Number(totalAmount.toFixed(2)),
     });
   }
 
   return returnsArray;
 }
-
-console.log(generateReturnsArray(100, 4, 'monthly', 0, 10, 'monthly'));

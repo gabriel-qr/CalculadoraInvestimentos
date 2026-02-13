@@ -2,8 +2,8 @@ export function validateAmount(type, amount) {
   if (amount === NaN && type !== 'Aporte adicional')
     throw new Error(`${type} informado deve ser um número.`);
 
-  if (!amount && type !== 'Aporte adicional')
-    throw new Error(`${type} deve ser informado.`);
+  //   if (!amount && type !== 'Aporte adicional')
+  //     throw new Error(`${type} deve ser informado.`);
 
   if (amount < 0 && type === 'Investimento inicial')
     throw new Error(`${type} deve ser maior do que zero.`);
