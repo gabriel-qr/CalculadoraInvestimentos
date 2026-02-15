@@ -1,5 +1,3 @@
-import { validateAmount, validateTimeHorizon } from './validation.js';
-
 function converToMonthlyReturnRate(yearlyReturnRate) {
   return yearlyReturnRate ** (1 / 12);
 }
@@ -12,11 +10,6 @@ export function generateReturnsArray(
   returnRate = 0,
   returnTimeframe = 'monthly',
 ) {
-  validateAmount('Investimento inicial', startingAmount);
-  // validateAmount('Aporte adicional', monthlyContribuition);
-  validateTimeHorizon(timeHorizon);
-  validateAmount('Rentabilidade', returnRate);
-
   const finalReturnRate =
     returnTimeframe === 'monthly'
       ? 1 + returnRate / 100
