@@ -1,7 +1,13 @@
 import { generateReturnsArray } from './src/investmentGoals.js';
+import Chart from 'chart.js/auto';
 
 const form = document.getElementById('form');
 const resetButton = document.getElementById('reset-button');
+const finalMoneyChart = document.getElementById('final-money-distribuition');
+const progressionChart = document.getElementById('progression');
+
+let doughnutChart = {};
+let barChart = {};
 
 function renderProgression(event) {
   event.preventDefault();
@@ -9,6 +15,8 @@ function renderProgression(event) {
     console.error('DEU RUIM');
     return;
   }
+
+  clearCharts();
 
   const startingAmount = Number(
     document.getElementById('starting-amount').value.replace(',', '.'),
@@ -34,9 +42,67 @@ function renderProgression(event) {
     returnRate,
     returnRatePeriod,
   );
-  console.log(result);
+
+  function formatCurrency(value) {
+    return value.toFixed(2);
+  }
+
+  const finalResult = result[result.length - 1];
+
+  doughnutChart = new Chart(finalMoneyChart, {
+    type: 'doughnut',
+    data: {
+      labels: ['Total Investido', 'Rendimento Total', 'Impostos'],
+      datasets: [
+        {
+          data: [
+            formatCurrency(finalResult.investedAmount),
+            formatCurrency(
+              finalResult.totalInterestReturns * (1 - taxRate / 100),
+            ),
+            formatCurrency(finalResult.totalInterestReturns * (taxRate / 100)),
+          ],
+          backgroundColor: [
+            'rgb(255, 99, 132)',
+            'rgb(54, 162, 235)',
+            'rgb(255, 205, 86)',
+          ],
+          hoverOffset: 4,
+        },
+      ],
+    },
+  });
+
+  barChart = new Chart(progressionChart, {
+    type: 'bar',
+    data: {
+      labels: result.map((item) => item.monthCounter),
+      datasets: [
+        {
+          label: 'Total Investido',
+          data: result.map((item) => formatCurrency(item.investedAmount)),
+          backgroundColor: 'rgb(255, 99, 132)',
+        },
+        {
+          label: 'Retorno do investimento',
+          data: result.map((item) => formatCurrency(item.interestReturns)),
+          backgroundColor: 'rgb(54, 162, 235)',
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      scales: {
+        x: {
+          stacked: true,
+        },
+        y: {
+          stacked: true,
+        },
+      },
+    },
+  });
 }
-form.hasAttribute;
 
 function validateInput(event) {
   const value = event.target.value.replace(',', '.');
@@ -71,6 +137,17 @@ for (const formElement of form) {
   }
 }
 
+function isObjectEmpty(object) {
+  return Object.keys(object).length === 0;
+}
+
+function clearCharts() {
+  if (!isObjectEmpty(doughnutChart) && !isObjectEmpty(barChart)) {
+    doughnutChart.destroy();
+    barChart.destroy();
+  }
+}
+
 function clearErrors() {
   const errorContainer = document.querySelectorAll('.error');
   for (const container of errorContainer) {
@@ -82,6 +159,7 @@ function clearErrors() {
 resetButton.addEventListener('click', () => {
   form.reset();
   clearErrors();
+  clearCharts();
 });
 
 form.addEventListener('submit', renderProgression);
