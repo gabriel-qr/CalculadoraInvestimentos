@@ -13,6 +13,9 @@ function createTableHeader(tableReference, columnsArray) {
 
   const theadReference = tableReference.querySelector('thead') ?? createThead();
   const headerRow = document.createElement('tr');
+  ['bg-blue-900', 'text-slate-200', 'top-0', 'sticky'].forEach((cssClass) => {
+    headerRow.classList.add(cssClass);
+  });
 
   columnsArray.forEach((columnObj) => {
     const headerElement = /*html*/ `<th>${columnObj.columnLabel}</th>`;
@@ -33,13 +36,14 @@ function createTableBody(tableReference, tableItems, columnsArray) {
 
   for (const [index, item] of tableItems.entries()) {
     const tableRow = document.createElement('tr');
+    if (index % 2 !== 0) tableRow.classList.add('bg-blue-200');
 
     columnsArray.forEach((columnObj) => {
       const data = columnObj.format
         ? formatCurrency(item[columnObj.accessor])
         : item[columnObj.accessor];
 
-      tableRow.innerHTML += /*html*/ `<td>${data}</td>`;
+      tableRow.innerHTML += /*html*/ `<td class="p-0.5">${data}</td>`;
     });
 
     tbodyReference.appendChild(tableRow);
