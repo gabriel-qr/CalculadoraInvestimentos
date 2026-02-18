@@ -1,5 +1,7 @@
 import { generateReturnsArray } from './src/investmentGoals.js';
 import Chart from 'chart.js/auto';
+import { createTable } from './src/table.js';
+import { isObjectEmpty, formatCurrency } from './src/auxiliar.js';
 
 const form = document.getElementById('form');
 const resetButton = document.getElementById('reset-button');
@@ -8,6 +10,34 @@ const progressionChart = document.getElementById('progression');
 
 let doughnutChart = {};
 let barChart = {};
+
+const columnsArray = [
+  {
+    columnLabel: 'Mês',
+    accessor: 'monthCounter',
+    format: false,
+  },
+  {
+    columnLabel: 'Total Investido',
+    accessor: 'investedAmount',
+    format: true,
+  },
+  {
+    columnLabel: 'Rendimento Mensal',
+    accessor: 'interestReturns',
+    format: true,
+  },
+  {
+    columnLabel: 'Rendimento Total',
+    accessor: 'totalInterestReturns',
+    format: true,
+  },
+  {
+    columnLabel: 'Quantia Total',
+    accessor: 'totalAmount',
+    format: true,
+  },
+];
 
 function renderProgression(event) {
   event.preventDefault();
@@ -43,65 +73,63 @@ function renderProgression(event) {
     returnRatePeriod,
   );
 
-  function formatCurrency(value) {
-    return value.toFixed(2);
-  }
+  // const finalResult = result[result.length - 1];
 
-  const finalResult = result[result.length - 1];
+  // doughnutChart = new Chart(finalMoneyChart, {
+  //   type: 'doughnut',
+  //   data: {
+  //     labels: ['Total Investido', 'Rendimento Total', 'Impostos'],
+  //     datasets: [
+  //       {
+  //         data: [
+  //           formatCurrency(finalResult.investedAmount),
+  //           formatCurrency(
+  //             finalResult.totalInterestReturns * (1 - taxRate / 100),
+  //           ),
+  //           formatCurrency(finalResult.totalInterestReturns * (taxRate / 100)),
+  //         ],
+  //         backgroundColor: [
+  //           'rgb(255, 99, 132)',
+  //           'rgb(54, 162, 235)',
+  //           'rgb(255, 205, 86)',
+  //         ],
+  //         hoverOffset: 4,
+  //       },
+  //     ],
+  //   },
+  // });
 
-  doughnutChart = new Chart(finalMoneyChart, {
-    type: 'doughnut',
-    data: {
-      labels: ['Total Investido', 'Rendimento Total', 'Impostos'],
-      datasets: [
-        {
-          data: [
-            formatCurrency(finalResult.investedAmount),
-            formatCurrency(
-              finalResult.totalInterestReturns * (1 - taxRate / 100),
-            ),
-            formatCurrency(finalResult.totalInterestReturns * (taxRate / 100)),
-          ],
-          backgroundColor: [
-            'rgb(255, 99, 132)',
-            'rgb(54, 162, 235)',
-            'rgb(255, 205, 86)',
-          ],
-          hoverOffset: 4,
-        },
-      ],
-    },
-  });
+  // barChart = new Chart(progressionChart, {
+  //   type: 'bar',
+  //   data: {
+  //     labels: result.map((item) => item.monthCounter),
+  //     datasets: [
+  //       {
+  //         label: 'Total Investido',
+  //         data: result.map((item) => formatCurrency(item.investedAmount)),
+  //         backgroundColor: 'rgb(255, 99, 132)',
+  //       },
+  //       {
+  //         label: 'Retorno do investimento',
+  //         data: result.map((item) => formatCurrency(item.interestReturns)),
+  //         backgroundColor: 'rgb(54, 162, 235)',
+  //       },
+  //     ],
+  //   },
+  //   options: {
+  //     responsive: true,
+  //     scales: {
+  //       x: {
+  //         stacked: true,
+  //       },
+  //       y: {
+  //         stacked: true,
+  //       },
+  //     },
+  //   },
+  // });
 
-  barChart = new Chart(progressionChart, {
-    type: 'bar',
-    data: {
-      labels: result.map((item) => item.monthCounter),
-      datasets: [
-        {
-          label: 'Total Investido',
-          data: result.map((item) => formatCurrency(item.investedAmount)),
-          backgroundColor: 'rgb(255, 99, 132)',
-        },
-        {
-          label: 'Retorno do investimento',
-          data: result.map((item) => formatCurrency(item.interestReturns)),
-          backgroundColor: 'rgb(54, 162, 235)',
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      scales: {
-        x: {
-          stacked: true,
-        },
-        y: {
-          stacked: true,
-        },
-      },
-    },
-  });
+  createTable(columnsArray, result, 'results-table');
 }
 
 function validateInput(event) {
@@ -111,6 +139,7 @@ function validateInput(event) {
 
   const errorTextElement = document.createElement('p');
   errorTextElement.classList.add('text-red-600');
+  errorTextElement.classList.add('text-sm');
   errorTextElement.textContent = 'Informe um valor numérico maior do que zero.';
 
   if (value === '') return;
@@ -135,10 +164,6 @@ for (const formElement of form) {
   if (formElement.tagName === 'INPUT' && formElement.hasAttribute('name')) {
     formElement.addEventListener('blur', validateInput);
   }
-}
-
-function isObjectEmpty(object) {
-  return Object.keys(object).length === 0;
 }
 
 function clearCharts() {
