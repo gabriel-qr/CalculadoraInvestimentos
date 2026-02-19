@@ -1,4 +1,4 @@
-import { formatCurrency } from './auxiliar.js';
+import { formatCurrencyToTable } from './auxiliar.js';
 
 function isNonEmptyArrray(data) {
   return Array.isArray(data) && data.length > 0;
@@ -40,13 +40,25 @@ function createTableBody(tableReference, tableItems, columnsArray) {
 
     columnsArray.forEach((columnObj) => {
       const data = columnObj.format
-        ? formatCurrency(item[columnObj.accessor])
+        ? formatCurrencyToTable(item[columnObj.accessor])
         : item[columnObj.accessor];
 
       tableRow.innerHTML += /*html*/ `<td class="p-0.5">${data}</td>`;
     });
 
     tbodyReference.appendChild(tableRow);
+  }
+}
+
+export function resetTable() {
+  const tableElement = document.getElementById('results-table');
+  const tableBody = tableElement.querySelector('tbody');
+  if (tableBody) {
+    tableBody.remove();
+  }
+  const tableHeader = tableElement.querySelector('thead');
+  if (tableHeader) {
+    tableHeader.remove();
   }
 }
 
@@ -60,6 +72,8 @@ export function createTable(columnsArray, dataArray, tableId) {
       'Informe corretamente os dados: Array com as colunas, Array com as informações das linhas e o ID do elemento',
     );
   }
+
+  resetTable();
 
   const tableElement = document.getElementById(tableId);
 

@@ -1,7 +1,7 @@
 import { generateReturnsArray } from './src/investmentGoals.js';
 import Chart from 'chart.js/auto';
-import { createTable } from './src/table.js';
-import { isObjectEmpty, formatCurrency } from './src/auxiliar.js';
+import { createTable, resetTable } from './src/table.js';
+import { isObjectEmpty, formatCurrencyToCharts } from './src/auxiliar.js';
 
 const form = document.getElementById('form');
 const resetButton = document.getElementById('reset-button');
@@ -73,61 +73,67 @@ function renderProgression(event) {
     returnRatePeriod,
   );
 
-  // const finalResult = result[result.length - 1];
+  const finalResult = result[result.length - 1];
 
-  // doughnutChart = new Chart(finalMoneyChart, {
-  //   type: 'doughnut',
-  //   data: {
-  //     labels: ['Total Investido', 'Rendimento Total', 'Impostos'],
-  //     datasets: [
-  //       {
-  //         data: [
-  //           formatCurrency(finalResult.investedAmount),
-  //           formatCurrency(
-  //             finalResult.totalInterestReturns * (1 - taxRate / 100),
-  //           ),
-  //           formatCurrency(finalResult.totalInterestReturns * (taxRate / 100)),
-  //         ],
-  //         backgroundColor: [
-  //           'rgb(255, 99, 132)',
-  //           'rgb(54, 162, 235)',
-  //           'rgb(255, 205, 86)',
-  //         ],
-  //         hoverOffset: 4,
-  //       },
-  //     ],
-  //   },
-  // });
+  doughnutChart = new Chart(finalMoneyChart, {
+    type: 'doughnut',
+    data: {
+      labels: ['Total Investido', 'Rendimento Total', 'Impostos'],
+      datasets: [
+        {
+          data: [
+            formatCurrencyToCharts(finalResult.investedAmount),
+            formatCurrencyToCharts(
+              finalResult.totalInterestReturns * (1 - taxRate / 100),
+            ),
+            formatCurrencyToCharts(
+              finalResult.totalInterestReturns * (taxRate / 100),
+            ),
+          ],
+          backgroundColor: [
+            'rgb(255, 99, 132)',
+            'rgb(54, 162, 235)',
+            'rgb(255, 205, 86)',
+          ],
+          hoverOffset: 4,
+        },
+      ],
+    },
+  });
 
-  // barChart = new Chart(progressionChart, {
-  //   type: 'bar',
-  //   data: {
-  //     labels: result.map((item) => item.monthCounter),
-  //     datasets: [
-  //       {
-  //         label: 'Total Investido',
-  //         data: result.map((item) => formatCurrency(item.investedAmount)),
-  //         backgroundColor: 'rgb(255, 99, 132)',
-  //       },
-  //       {
-  //         label: 'Retorno do investimento',
-  //         data: result.map((item) => formatCurrency(item.interestReturns)),
-  //         backgroundColor: 'rgb(54, 162, 235)',
-  //       },
-  //     ],
-  //   },
-  //   options: {
-  //     responsive: true,
-  //     scales: {
-  //       x: {
-  //         stacked: true,
-  //       },
-  //       y: {
-  //         stacked: true,
-  //       },
-  //     },
-  //   },
-  // });
+  barChart = new Chart(progressionChart, {
+    type: 'bar',
+    data: {
+      labels: result.map((item) => item.monthCounter),
+      datasets: [
+        {
+          label: 'Total Investido',
+          data: result.map((item) =>
+            formatCurrencyToCharts(item.investedAmount),
+          ),
+          backgroundColor: 'rgb(255, 99, 132)',
+        },
+        {
+          label: 'Retorno do investimento',
+          data: result.map((item) =>
+            formatCurrencyToCharts(item.interestReturns),
+          ),
+          backgroundColor: 'rgb(54, 162, 235)',
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      scales: {
+        x: {
+          stacked: true,
+        },
+        y: {
+          stacked: true,
+        },
+      },
+    },
+  });
 
   createTable(columnsArray, result, 'results-table');
 }
@@ -181,10 +187,23 @@ function clearErrors() {
   }
 }
 
+const mainElement = document.querySelector('main');
+const carouselElement = document.getElementById('carousel');
+const nextButton = document.getElementById('slide-arrow-next');
+const previousButton = document.getElementById('slide-arrow-previous');
+
+nextButton.addEventListener('click', () => {
+  carouselElement.scrollLeft += mainElement.clientWidth;
+});
+previousButton.addEventListener('click', () => {
+  carouselElement.scrollLeft -= mainElement.clientWidth;
+});
+
 resetButton.addEventListener('click', () => {
   form.reset();
   clearErrors();
   clearCharts();
+  resetTable();
 });
 
 form.addEventListener('submit', renderProgression);
